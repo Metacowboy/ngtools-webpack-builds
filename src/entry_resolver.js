@@ -106,7 +106,7 @@ function _symbolImportLookup(refactor, symbolName, host, program) {
 }
 function resolveEntryModuleFromMain(mainPath, host, program) {
     const source = new refactor_1.TypeScriptFileRefactor(mainPath, host, program);
-    const bootstrap = source.findAstNodes(source.sourceFile, ts.SyntaxKind.CallExpression, true)
+    const bootstraps = source.findAstNodes(source.sourceFile, ts.SyntaxKind.CallExpression, true)
         .map(node => node)
         .filter(call => {
         const access = call.expression;
@@ -117,15 +117,22 @@ function resolveEntryModuleFromMain(mainPath, host, program) {
     })
         .map(node => node.arguments[0])
         .filter(node => node.kind == ts.SyntaxKind.Identifier);
-    if (bootstrap.length != 1) {
+    if (bootstraps.length < 1) {
         throw new Error('Tried to find bootstrap code, but could not. Specify either '
             + 'statically analyzable bootstrap code or pass in an entryModule '
             + 'to the plugins options.');
     }
-    const bootstrapSymbolName = bootstrap[0].text;
-    const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);
-    if (module) {
-        return `${module.replace(/\.ts$/, '')}#${bootstrapSymbolName}`;
+    const entryModules = [];
+    bootstraps.forEach((bootstrap) => {
+        const bootstrapSymbolName = bootstrap.text;
+        const module = _symbolImportLookup(source, bootstrapSymbolName, host, program);
+        if (module) {
+            entryModules.push(`${module.replace(/\.ts$/, '')}#${bootstrapSymbolName}`);
+        }
+    });
+  
+    if (entryModules.length > 0) {
+      return entryModules;
     }
     // shrug... something bad happened and we couldn't find the import statement.
     throw new Error('Tried to find bootstrap code, but could not. Specify either '

@@ -7,7 +7,7 @@ export interface AngularCompilerPluginOptions {
     sourceMap?: boolean;
     tsConfigPath: string;
     basePath?: string;
-    entryModule?: string;
+    entryModule?: string | string[];
     mainPath?: string;
     skipCodeGeneration?: boolean;
     hostReplacementPaths?: {

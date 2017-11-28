@@ -184,7 +184,7 @@ class AotPlugin {
         // still no _entryModule? => try to resolve from mainPath
         if (!this._entryModule && options.mainPath) {
             const mainPath = path.resolve(basePath, options.mainPath);
-            this._entryModule = entry_resolver_1.resolveEntryModuleFromMain(mainPath, this._compilerHost, this._program);
+            this._entryModule = entry_resolver_1.resolveEntryModuleFromMain(mainPath, this._compilerHost, this._program)[0];
         }
         if (options.hasOwnProperty('i18nFile')) {
             this._i18nFile = options.i18nFile;
